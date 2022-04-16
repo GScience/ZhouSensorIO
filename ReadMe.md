@@ -31,5 +31,8 @@
 ```SENSOR_API HRESULT sensor_get_****_id(***);```
 尝试读取指定类型的卡。
 
+```SENSOR_API void sensor_set_sensitivity(uint8_t sensitivity)```
+设置手台灵敏度，默认为1。
+
 ### 程序结构
 当调用 ```sensor_start();``` 时，会尝试连接到已经启动的手台 ```Host``` ，若未连接成功则会尝试创建新的 ```Host``` 。不同进程之间采用共享内存访问手台状态，包括读卡器，IR以及触摸板，未作同步处理。 ```Host``` 相关代码在  ```Host.c``` 中。

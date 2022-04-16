@@ -10,6 +10,7 @@
 #pragma comment(lib,"hid.lib")
 
 #define HOST_BUFFER ((host_buffer_t*)host_buffer)
+#define HOST_WRITE_TIME_BEFORE_READ 10
 
 uplink_data_t   uplink_data;
 downlink_data_t downlink_data;
@@ -91,6 +92,7 @@ static HANDLE host_connect_to_pad()
 static void host_thread_proc(void* arg)
 {
     HANDLE device_handle;
+    uint16_t write_time = 0;
 
     // Wait for handle
     do
@@ -117,14 +119,16 @@ static void host_thread_proc(void* arg)
         memcpy(HOST_BUFFER->card_id, uplink_data.card_id, sizeof(HOST_BUFFER->card_id));
 
         // send data
-        downlink_data.address = 0;
-        memcpy(downlink_data.reader_led, HOST_BUFFER->reader_led, sizeof(downlink_data.reader_led));
-        memcpy(downlink_data.touch_led, HOST_BUFFER->touch_led, sizeof(downlink_data.touch_led));
+        if (++write_time > HOST_WRITE_TIME_BEFORE_READ)
+        {
+            write_time = 0;
+            downlink_data.address = 0;
+            memcpy(downlink_data.reader_led, HOST_BUFFER->reader_led, sizeof(downlink_data.reader_led));
+            memcpy(downlink_data.touch_led, HOST_BUFFER->touch_led, sizeof(downlink_data.touch_led));
 
-        if (!WriteFile(device_handle, &downlink_data, sizeof(downlink_data), NULL, NULL))
-            break;
-
-        Sleep(1);
+            if (!WriteFile(device_handle, &downlink_data, sizeof(downlink_data), NULL, NULL))
+                break;
+        }
     }
 
     CloseHandle(device_handle);

@@ -97,15 +97,15 @@ int main()
 			set_cursor(i * 3 + 3 + sensor_x, 6 + sensor_y);
 			printf("%02x ", touch[i * 2 + 1]);
 			
-			color[(15 - i) * 3 * 2 + 0] = (uint8_t)((touch[i * 2] + touch[i * 2 + 1]) / 510.0f * 128) + 128;
-			color[(15 - i) * 3 * 2 + 1] = (uint8_t)((touch[i * 2] + touch[i * 2 + 1]) / 510.0f * 255);
-			color[(15 - i) * 3 * 2 + 2] = (uint8_t)((touch[i * 2] + touch[i * 2 + 1]) / 510.0f * 128);
+			color[(15 - i) * 3 * 2 + 1] = (uint8_t)((touch[i * 2] + touch[i * 2 + 1]) / 510.0f * 128) + 128;
+			color[(15 - i) * 3 * 2 + 2] = (uint8_t)((touch[i * 2] + touch[i * 2 + 1]) / 510.0f * 255);
+			color[(15 - i) * 3 * 2 + 0] = (uint8_t)((touch[i * 2] + touch[i * 2 + 1]) / 510.0f * 128);
 
 			if (i != 0)
 			{
-				color[(15 - i) * 3 * 2 + 3] = (color_loop & 0xFF) >> 0;
-				color[(15 - i) * 3 * 2 + 4] = (color_loop & 0xFF00) >> 8;
-				color[(15 - i) * 3 * 2 + 5] = (color_loop & 0xFF0000) >> 16;
+				color[(15 - i) * 3 * 2 + 4] = (color_loop & 0xFF) >> 0;
+				color[(15 - i) * 3 * 2 + 5] = (color_loop & 0xFF00) >> 8;
+				color[(15 - i) * 3 * 2 + 3] = (color_loop & 0xFF0000) >> 16;
 			}
 		}
 
@@ -152,7 +152,6 @@ int main()
 		}
 		set_cursor(60 + sensor_x, sensor_y + 3);
 		printf("----------------------");
-
 		Sleep(1);
 	}
 }

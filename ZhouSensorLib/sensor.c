@@ -6,6 +6,7 @@
 
 LPVOID sensor_buffer	= NULL;
 HANDLE sensor_map		= NULL;
+uint8_t sensor_sensitivity = 1;
 
 #define SENSOR_BUFFER		((host_buffer_t*)sensor_buffer)
 #define SENSOR_COLOR_SCALE	0xF
@@ -85,6 +86,20 @@ SENSOR_API void sensor_get_touch(uint8_t* buffer)
 		return;
 
 	memcpy(buffer, SENSOR_BUFFER->touch_value, sizeof(SENSOR_BUFFER->touch_value));
+
+	if (sensor_sensitivity != 1)
+	{
+		float value;
+		for (uint8_t i = 0; i < 32; ++i)
+		{
+			value = buffer[i] * (1 + (sensor_sensitivity - 1) / 10.0f);
+
+			if (value > 255)
+				buffer[i] = 255;
+			else
+				buffer[i] = (uint8_t)value;
+		}
+	}
 }
 
 SENSOR_API uint8_t sensor_get_card_statue()
@@ -138,13 +153,18 @@ SENSOR_API void sensor_set_color(uint8_t* color)
 	for (int i = 0; i < 16; ++i)
 	{
 		uint32_t compress_color =
-			(((int)(color[i * 6 + 0] / 255.0f * SENSOR_COLOR_SCALE)) << 0) |
-			(((int)(color[i * 6 + 1] / 255.0f * SENSOR_COLOR_SCALE)) << 4) |
-			(((int)(color[i * 6 + 2] / 255.0f * SENSOR_COLOR_SCALE)) << 8) |
-			(((int)(color[i * 6 + 3] / 255.0f * SENSOR_COLOR_SCALE)) << 12) |
-			(((int)(color[i * 6 + 4] / 255.0f * SENSOR_COLOR_SCALE)) << 16) |
-			(((int)(color[i * 6 + 5] / 255.0f * SENSOR_COLOR_SCALE)) << 20);
+			(((int)(color[i * 6 + 1] / 255.0f * SENSOR_COLOR_SCALE)) << 0) |
+			(((int)(color[i * 6 + 2] / 255.0f * SENSOR_COLOR_SCALE)) << 4) |
+			(((int)(color[i * 6 + 0] / 255.0f * SENSOR_COLOR_SCALE)) << 8) |
+			(((int)(color[i * 6 + 4] / 255.0f * SENSOR_COLOR_SCALE)) << 12) |
+			(((int)(color[i * 6 + 5] / 255.0f * SENSOR_COLOR_SCALE)) << 16) |
+			(((int)(color[i * 6 + 3] / 255.0f * SENSOR_COLOR_SCALE)) << 20);
 
 		memcpy(&SENSOR_BUFFER->touch_led[i * 3], &compress_color, sizeof(uint8_t) * 3);
 	}
+}
+
+SENSOR_API void sensor_set_sensitivity(uint8_t sensitivity)
+{
+	sensor_sensitivity = sensitivity;
 }
